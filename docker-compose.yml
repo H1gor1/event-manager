@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: event-manager_db
+    environment:
+      POSTGRES_USER: event-manager
+      POSTGRES_PASSWORD: e193U2JY
+      POSTGRES_DB: event-manager_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
