@@ -1,0 +1,68 @@
+<div class="hero bg-base-200 min-h-screen">
+  <div class="hero-content flex-col lg:flex-row-reverse">
+    <div class="text-center lg:text-left">
+      <h1 class="text-5xl font-bold">Entre na sua conta</h1>
+      <p class="py-6">
+        Acesse sua conta para gerenciar suas informações e acompanhar seus dados.
+      </p>
+    </div>
+
+    <div class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
+      <div class="card-body">
+        <!-- Mensagem de erro -->
+        <div *ngIf="error" class="alert alert-error" role="alert">
+          {{ error }}
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Email</span>
+            </label>
+            <input
+              type="email"
+              formControlName="email"
+              class="input input-bordered"
+              placeholder="seu@email.com"
+            />
+            <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="text-error text-xs mt-1">
+              <span *ngIf="loginForm.get('email')?.errors?.['required']">Email é obrigatório</span>
+              <span *ngIf="loginForm.get('email')?.errors?.['email']">Email inválido</span>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Senha</span>
+            </label>
+            <input
+              type="password"
+              formControlName="password"
+              class="input input-bordered"
+              placeholder="Senha"
+            />
+            <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-error text-xs mt-1">
+              <span *ngIf="loginForm.get('password')?.errors?.['required']">Senha é obrigatória</span>
+              <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Senha deve ter pelo menos 6 caracteres</span>
+            </div>
+
+            <label class="label">
+              <a href="#" class="label-text-alt link link-hover">Esqueceu a senha?</a>
+            </label>
+          </div>
+
+          <div class="form-control mt-6">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="loginForm.invalid || loading"
+            >
+              <span *ngIf="loading" class="loading loading-spinner loading-xs mr-2"></span>
+              Entrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
