@@ -1,0 +1,98 @@
+<div class="hero bg-base-200 min-h-screen">
+  <div class="hero-content flex-col lg:flex-row-reverse">
+    <div class="text-center lg:text-left">
+      <h1 class="text-5xl font-bold">Crie sua conta</h1>
+      <p class="py-6">
+        Cadastre-se para acessar todos os recursos da nossa plataforma.
+      </p>
+    </div>
+
+    <div class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
+      <div class="card-body">
+        <!-- Mensagem de erro -->
+        <div *ngIf="error" class="alert alert-error" role="alert">
+          {{ error }}
+        </div>
+
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Nome</span>
+            </label>
+            <input
+              type="text"
+              formControlName="firstName"
+              class="input input-bordered"
+              placeholder="Seu nome"
+            />
+            <div *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched" class="text-error text-xs mt-1">
+              <span *ngIf="registerForm.get('firstName')?.errors?.['required']">Nome é obrigatório</span>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Sobrenome</span>
+            </label>
+            <input
+              type="text"
+              formControlName="lastName"
+              class="input input-bordered"
+              placeholder="Seu sobrenome"
+            />
+            <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched" class="text-error text-xs mt-1">
+              <span *ngIf="registerForm.get('lastName')?.errors?.['required']">Sobrenome é obrigatório</span>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Email</span>
+            </label>
+            <input
+              type="email"
+              formControlName="email"
+              class="input input-bordered"
+              placeholder="seu@email.com"
+            />
+            <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="text-error text-xs mt-1">
+              <span *ngIf="registerForm.get('email')?.errors?.['required']">Email é obrigatório</span>
+              <span *ngIf="registerForm.get('email')?.errors?.['email']">Email inválido</span>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Senha</span>
+            </label>
+            <input
+              type="password"
+              formControlName="password"
+              class="input input-bordered"
+              placeholder="Senha"
+            />
+            <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="text-error text-xs mt-1">
+              <span *ngIf="registerForm.get('password')?.errors?.['required']">Senha é obrigatória</span>
+              <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Senha deve ter pelo menos 6 caracteres</span>
+            </div>
+          </div>
+
+          <div class="form-control mt-6">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="registerForm.invalid || loading"
+            >
+              <span *ngIf="loading" class="loading loading-spinner loading-xs mr-2"></span>
+              Cadastrar
+            </button>
+          </div>
+
+          <div class="mt-4 text-center">
+            <p>Já tem uma conta? <a routerLink="/login" class="link link-primary">Entrar</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

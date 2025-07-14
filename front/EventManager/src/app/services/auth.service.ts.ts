@@ -84,4 +84,20 @@ export class AuthServiceTs {
     const userInfo = localStorage.getItem('user_info');
     return userInfo ? JSON.parse(userInfo) : null;
   }
+
+  register(userData: { firstName: string, lastName: string, email: string, password: string }): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/user/signup`,
+      userData
+    ).pipe(
+      tap(response => {
+        console.log('Registro bem-sucedido:', response);
+      }),
+      catchError(error => {
+        console.error('Erro no registro:', error);
+        throw error;
+      })
+    );
+  }
+
 }

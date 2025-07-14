@@ -2,16 +2,14 @@ package br.com.ifmg.event_manager.entities;
 
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
-@Table(name="tb_user")
+@Table(name = "tb_user")
 public class User implements UserDetails {
 
     @Id
@@ -29,6 +27,9 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Event> events;
 
     public User() {
 
