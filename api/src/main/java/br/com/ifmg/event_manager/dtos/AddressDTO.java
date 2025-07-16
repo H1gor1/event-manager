@@ -14,11 +14,12 @@ public class AddressDTO {
     private String city;
     private String state;
     private Long zipCode;
+    private Long eventId; // ID do evento associado ao endereço
 
     public AddressDTO() {
     }
 
-    public AddressDTO(Long id, String street, Integer number, String complement, String neighborhood, String city, String state, Long zipCode) {
+    public AddressDTO(Long id, String street, Integer number, String complement, String neighborhood, String city, String state, Long zipCode, Long eventId) {
         this.id = id;
         this.street = street;
         this.number = number;
@@ -27,6 +28,7 @@ public class AddressDTO {
         this.city = city;
         this.state = state;
         this.zipCode = zipCode;
+        this.eventId = eventId;
     }
 
     public AddressDTO(Address entity) {
@@ -38,6 +40,7 @@ public class AddressDTO {
         this.city = entity.getCity();
         this.state = entity.getState();
         this.zipCode = entity.getZipCode();
+        this.eventId = entity.getEvent() != null ? entity.getEvent().getId() : null;
     }
 
     public Long getId() {
@@ -104,15 +107,23 @@ public class AddressDTO {
         this.zipCode = zipCode;
     }
 
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof AddressDTO that)) return false;
-        return Objects.equals(id, that.id) && Objects.equals(street, that.street) && Objects.equals(number, that.number) && Objects.equals(complement, that.complement) && Objects.equals(neighborhood, that.neighborhood) && Objects.equals(city, that.city) && Objects.equals(state, that.state) && Objects.equals(zipCode, that.zipCode);
+        return Objects.equals(id, that.id) && Objects.equals(street, that.street) && Objects.equals(number, that.number) && Objects.equals(complement, that.complement) && Objects.equals(neighborhood, that.neighborhood) && Objects.equals(city, that.city) && Objects.equals(state, that.state) && Objects.equals(zipCode, that.zipCode) && Objects.equals(eventId, that.eventId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, street, number, complement, neighborhood, city, state, zipCode);
+        return Objects.hash(id, street, number, complement, neighborhood, city, state, zipCode, eventId);
     }
 
     @Override
@@ -126,6 +137,7 @@ public class AddressDTO {
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", zipCode=" + zipCode +
+                ", eventId=" + eventId +
                 '}';
     }
 }

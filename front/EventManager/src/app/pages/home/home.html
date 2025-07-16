@@ -1,5 +1,106 @@
 <div class="p-5 h-full">
-  <div class="grid justify-center">
-    <!-- Seu conteúdo aqui -->
+  <div class="flex flex-col items-center justify-center">
+    <!-- Cabeçalho da tabela com título e botão de adicionar -->
+    <div class="w-full max-w-4xl flex justify-between items-center mb-2">
+      <h2 class="text-xl font-bold">Eventos</h2>
+      <button class="btn btn-primary" (click)="openAddEventModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Adicionar Evento
+      </button>
+    </div>
+
+    <!-- Tabela centralizada -->
+    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-full max-w-4xl mb-4">
+      <table class="table">
+        <!-- head -->
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Descrição</th>
+          <th>Data</th>
+          <th>Número de Convidados</th>
+          <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Linhas dinâmicas baseadas nos dados -->
+        <tr *ngFor="let event of events">
+          <th>{{ event.id }}</th>
+          <td>{{ event.name }}</td>
+          <td class="max-w-xs truncate">{{ event.description }}</td>
+          <td>{{ formatDate(event.eventDate) }}</td>
+          <td>{{ event.guestNumber }}</td>
+          <td>
+            <button class="btn btn-sm btn-outline" (click)="viewEventDetails(event.id)">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Detalhes
+            </button>
+          </td>
+        </tr>
+        <!-- Mensagem quando não há dados -->
+        <tr *ngIf="events.length === 0">
+          <td colspan="6" class="text-center">Nenhum evento encontrado</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginação -->
+    <div class="join" *ngIf="totalPages > 0">
+      <button
+        *ngFor="let page of getPageNumbers()"
+        class="join-item btn"
+        [class.btn-active]="page === currentPage"
+        (click)="changePage(page)">
+        {{ page + 1 }}
+      </button>
+    </div>
   </div>
+
+  <!-- Modal para adicionar evento -->
+  <dialog id="add_event_modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">Adicionar Novo Evento</h3>
+      <form [formGroup]="eventForm" (ngSubmit)="saveEvent()">
+        <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
+          <legend class="fieldset-legend">Detalhes do Evento</legend>
+
+          <label class="label">Nome do Evento</label>
+          <input type="text" class="input input-bordered w-full" placeholder="Nome do evento" formControlName="name" />
+          <div *ngIf="eventForm.get('name')?.invalid && eventForm.get('name')?.touched" class="text-error text-sm mt-1">
+            Nome do evento é obrigatório
+          </div>
+
+          <label class="label">Descrição</label>
+          <textarea class="textarea textarea-bordered w-full" placeholder="Descrição detalhada do evento" formControlName="description" rows="3"></textarea>
+          <div *ngIf="eventForm.get('description')?.invalid && eventForm.get('description')?.touched" class="text-error text-sm mt-1">
+            Descrição do evento é obrigatória
+          </div>
+
+          <label class="label">Data do Evento</label>
+          <app-date-picker formControlName="eventDate"></app-date-picker>
+          <div *ngIf="eventForm.get('eventDate')?.invalid && eventForm.get('eventDate')?.touched" class="text-error text-sm mt-1">
+            Data do evento é obrigatória
+          </div>
+
+          <label class="label">Número de Convidados</label>
+          <input type="number" class="input input-bordered w-full" placeholder="100" formControlName="guestNumber" min="1" />
+          <div *ngIf="eventForm.get('guestNumber')?.invalid && eventForm.get('guestNumber')?.touched" class="text-error text-sm mt-1">
+            Número de convidados é obrigatório e deve ser maior que zero
+          </div>
+        </fieldset>
+
+        <div class="modal-action">
+          <button type="button" class="btn" (click)="closeAddEventModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="eventForm.invalid">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
 </div>

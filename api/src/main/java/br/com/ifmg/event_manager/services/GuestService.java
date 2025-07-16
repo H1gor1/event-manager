@@ -1,7 +1,9 @@
 package br.com.ifmg.event_manager.services;
 
+import br.com.ifmg.event_manager.dtos.EmailDTO;
 import br.com.ifmg.event_manager.dtos.GuestDTO;
 import br.com.ifmg.event_manager.entities.Guest;
+import br.com.ifmg.event_manager.entities.TableEntity;
 import br.com.ifmg.event_manager.repositories.GuestRepository;
 import br.com.ifmg.event_manager.repositories.TableEntityRepository;
 import br.com.ifmg.event_manager.services.exceptions.DatabaseException;
@@ -14,7 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class GuestService {
@@ -24,6 +28,9 @@ public class GuestService {
 
     @Autowired
     TableEntityRepository tableEntityRepository;
+
+    @Autowired
+    EmailService emailService;
 
     @Transactional(readOnly = true)
     public Page<GuestDTO> findAll(Pageable pageable) {
@@ -38,6 +45,15 @@ public class GuestService {
         }
         Page<Guest> guests = guestRepository.findByTableId(tableId, pageable);
         return guests.map(GuestDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GuestDTO> findAllByTableId(Long tableId) {
+        if (!tableEntityRepository.existsById(tableId)) {
+            throw new ResourceNotFound("Table not found: " + tableId);
+        }
+        List<Guest> guests = guestRepository.findAllByTableId(tableId);
+        return guests.stream().map(GuestDTO::new).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -81,9 +97,58 @@ public class GuestService {
         }
     }
 
+    public void sendConfirmationEmail(Long guestId) {
+        Guest guest = guestRepository.findById(guestId)
+                .orElseThrow(() -> new ResourceNotFound("Guest not found: " + guestId));
+
+        if (guest.getEmail() == null || guest.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Guest email is not provided");
+        }
+
+        TableEntity table = guest.getTable();
+        if (table == null) {
+            throw new IllegalArgumentException("Guest is not assigned to any table");
+        }
+
+        // Preparar o DTO de email
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setTo(guest.getEmail());
+        emailDTO.setSubject("Confirmação de Presença - Evento");
+
+        String bodyTemplate = """
+            Olá %s,
+            
+            Você foi convidado para o evento e foi alocado na Mesa #%d.
+            
+            %s
+            
+            Para confirmar sua presença, por favor acesse o link:
+            http://seusite.com/confirm/%d
+            
+            Agradecemos sua atenção.
+            
+            Atenciosamente,
+            Equipe do Evento
+            """;
+
+        String body = String.format(bodyTemplate,
+                guest.getName(),
+                table.getId(),
+                table.getDescription() != null ? "Descrição: " + table.getDescription() : "",
+                guest.getId());
+
+        emailDTO.setBody(body);
+
+        // Enviar o email
+        emailService.sendMail(emailDTO);
+    }
+
+
     private void copyDtoToEntity(GuestDTO dto, Guest entity) {
         entity.setName(dto.getName());
         entity.setEmail(dto.getEmail());
+        entity.setPhone(dto.getPhone());
+        entity.setUrlPhoto(dto.getUrlPhoto() != null ? dto.getUrlPhoto().trim() : null );
         entity.setConfirmed(dto.getConfirmed());
 
         if (dto.getTableId() != null) {

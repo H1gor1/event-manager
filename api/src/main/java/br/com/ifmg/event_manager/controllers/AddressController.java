@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -34,6 +36,7 @@ public class AddressController {
                     @ApiResponse(responseCode = "403", description = "Forbidden")
             }
     )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Page<AddressDTO>> findAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
@@ -55,9 +58,26 @@ public class AddressController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<AddressDTO> findById(@PathVariable Long id){
 
         AddressDTO address = addressService.findById(id);
+        return ResponseEntity.ok().body(address);
+    }
+
+    @GetMapping(value = "/event/{id}", produces = "application/json")
+    @Operation(
+            description = "Find address by event ID",
+            summary = "Find address by event ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Not Found")
+            }
+    )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    public ResponseEntity<AddressDTO> findByEventId(@PathVariable Long id){
+
+        AddressDTO address = addressService.findByEventId(id);
         return ResponseEntity.ok().body(address);
     }
 
@@ -72,7 +92,7 @@ public class AddressController {
                     @ApiResponse(responseCode = "403", description = "Forbidden")
             }
     )
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<AddressDTO> insert(@RequestBody AddressDTO dto){
 
         dto = addressService.insert(dto);
@@ -97,7 +117,7 @@ public class AddressController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<AddressDTO> update(@PathVariable Long id, @RequestBody AddressDTO dto){
 
         dto = addressService.update(id, dto);
@@ -117,7 +137,7 @@ public class AddressController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Void> delete(@PathVariable Long id){
         addressService.delete(id);
         return ResponseEntity.noContent().build();

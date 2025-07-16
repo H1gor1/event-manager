@@ -13,19 +13,17 @@ public class EventDTO {
     private String description;
     private LocalDate eventDate;
     private Integer guestNumber;
-    private Long addressId; // ID do endereço associado ao evento
     private Long userId; // ID do usuário associado ao evento
 
     public EventDTO() {
     }
 
-    public EventDTO(Long id, String name, String description, LocalDate eventDate, Integer guestNumber, Long addressId, Long userId) {
+    public EventDTO(Long id, String name, String description, LocalDate eventDate, Integer guestNumber, Long userId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.eventDate = eventDate;
         this.guestNumber = guestNumber;
-        this.addressId = addressId;
         this.userId = userId;
     }
 
@@ -35,8 +33,7 @@ public class EventDTO {
         this.description = entity.getDescription();
         this.eventDate = entity.getEventDate();
         this.guestNumber = entity.getGuestNumber();
-        this.addressId = entity.getAddress().getId(); // Supondo que o método getAddressId() exista
-        this.userId = entity.getUser().getId(); // Supondo que o método getUserId() exista
+        this.userId = entity.getUser() != null ? entity.getUser().getId() : null;
     }
 
     public Long getId() {
@@ -79,14 +76,6 @@ public class EventDTO {
         this.guestNumber = guestNumber;
     }
 
-    public Long getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(Long addressId) {
-        this.addressId = addressId;
-    }
-
     public Long getUserId() {
         return userId;
     }
@@ -98,12 +87,12 @@ public class EventDTO {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof EventDTO eventDTO)) return false;
-        return Objects.equals(id, eventDTO.id) && Objects.equals(name, eventDTO.name) && Objects.equals(description, eventDTO.description) && Objects.equals(eventDate, eventDTO.eventDate) && Objects.equals(guestNumber, eventDTO.guestNumber) && Objects.equals(addressId, eventDTO.addressId) && Objects.equals(userId, eventDTO.userId);
+        return Objects.equals(id, eventDTO.id) && Objects.equals(name, eventDTO.name) && Objects.equals(description, eventDTO.description) && Objects.equals(eventDate, eventDTO.eventDate) && Objects.equals(guestNumber, eventDTO.guestNumber) && Objects.equals(userId, eventDTO.userId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, eventDate, guestNumber, addressId, userId);
+        return Objects.hash(id, name, description, eventDate, guestNumber, userId);
     }
 
     @Override
@@ -114,7 +103,6 @@ public class EventDTO {
                 ", description='" + description + '\'' +
                 ", eventDate=" + eventDate +
                 ", guestNumber=" + guestNumber +
-                ", addressId=" + addressId +
                 ", userId=" + userId +
                 '}';
     }

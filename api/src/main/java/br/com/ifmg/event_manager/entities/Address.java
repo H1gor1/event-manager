@@ -1,3 +1,4 @@
+
 package br.com.ifmg.event_manager.entities;
 
 import jakarta.persistence.*;
@@ -18,6 +19,10 @@ public class Address {
     private String city;
     private String state;
     private Long zipCode;
+
+    @OneToOne
+    @JoinColumn(name = "event_id")
+    private Event event; // Novo relacionamento com Event 1-1, um endereço pertence a um evento
 
     public Address() {
     }
@@ -95,6 +100,14 @@ public class Address {
 
     public void setZipCode(Long zipCode) {
         this.zipCode = zipCode;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     @Override

@@ -14,6 +14,8 @@ public class Guest {
     private Long id;
     private String name;
     private String email;
+    private String phone;
+    private String urlPhoto;
     private Boolean confirmed;
 
     @ManyToOne
@@ -23,10 +25,12 @@ public class Guest {
     public Guest() {
     }
 
-    public Guest(Long id, String name, String email, Boolean confirmed, TableEntity table) {
+    public Guest(Long id, String name, String email, String phone, String urlPhoto, Boolean confirmed, TableEntity table) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.phone = phone;
+        this.urlPhoto = urlPhoto;
         this.confirmed = confirmed;
         this.table = table;
     }
@@ -69,6 +73,22 @@ public class Guest {
 
     public void setTable(TableEntity table) {
         this.table = table;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getUrlPhoto() {
+        return urlPhoto;
+    }
+
+    public void setUrlPhoto(String urlPhoto) {
+        this.urlPhoto = urlPhoto;
     }
 
     @Override

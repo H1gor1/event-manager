@@ -1,0 +1,46 @@
+.avatar-ring {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  position: relative;
+  border: 1px dashed rgba(0,0,0,0.1);
+}
+
+.guest-avatar {
+  position: absolute;
+  transform:
+    rotate(var(--angle))
+    translate(var(--distance))
+    rotate(calc(-1 * var(--angle)));
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.guest-avatar:hover {
+  transform:
+    rotate(var(--angle))
+    translate(calc(var(--distance) + 10px))
+    rotate(calc(-1 * var(--angle)))
+    scale(1.1);
+  z-index: 20;
+}
+
+/* Assegurando que o conteúdo dos avatares está centralizado */
+.guest-avatar .avatar div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Garantindo que os SVGs estão centralizados */
+.guest-avatar svg {
+  margin: 0 auto;
+  display: block;
+}
+
+/* Estilos específicos para o botão de adicionar */
+.guest-avatar [class*="rounded-full"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

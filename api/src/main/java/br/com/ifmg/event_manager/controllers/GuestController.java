@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/guests")
@@ -34,6 +35,7 @@ public class GuestController {
                     @ApiResponse(responseCode = "403", description = "Forbidden")
             }
     )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Page<GuestDTO>> findAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
@@ -55,6 +57,7 @@ public class GuestController {
                     @ApiResponse(responseCode = "404", description = "Table Not Found")
             }
     )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Page<GuestDTO>> findByTableId(
             @PathVariable Long tableId,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -67,6 +70,22 @@ public class GuestController {
         return ResponseEntity.ok().body(guests);
     }
 
+    @GetMapping(value = "/all-by-table/{tableId}", produces = "application/json")
+    @Operation(
+            description = "Get all guests for a specific table without pagination",
+            summary = "Get all guests by table ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "404", description = "Table Not Found")
+            }
+    )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    public ResponseEntity<List<GuestDTO>> findAllByTableId(@PathVariable Long tableId) {
+        List<GuestDTO> guests = guestService.findAllByTableId(tableId);
+        return ResponseEntity.ok().body(guests);
+    }
+
+
     @GetMapping(value = "/{id}", produces = "application/json")
     @Operation(
             description = "Find guest by ID",
@@ -76,11 +95,31 @@ public class GuestController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<GuestDTO> findById(@PathVariable Long id){
 
         GuestDTO guest = guestService.findById(id);
         return ResponseEntity.ok().body(guest);
     }
+
+    @PostMapping(value = "/{id}/send-confirmation", produces = "application/json")
+    @Operation(
+            description = "Send confirmation email to a guest",
+            summary = "Send confirmation email",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "No Content - Email sent successfully"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request - Invalid guest data"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "403", description = "Forbidden"),
+                    @ApiResponse(responseCode = "404", description = "Not Found - Guest not found")
+            }
+    )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    public ResponseEntity<Void> sendConfirmationEmail(@PathVariable Long id) {
+        guestService.sendConfirmationEmail(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @PostMapping(produces = "application/json")
     @Operation(
@@ -93,7 +132,7 @@ public class GuestController {
                     @ApiResponse(responseCode = "403", description = "Forbidden")
             }
     )
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<GuestDTO> insert(@RequestBody GuestDTO dto){
 
         dto = guestService.insert(dto);
@@ -118,7 +157,7 @@ public class GuestController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<GuestDTO> update(@PathVariable Long id, @RequestBody GuestDTO dto){
 
         dto = guestService.update(id, dto);
@@ -138,7 +177,7 @@ public class GuestController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Void> delete(@PathVariable Long id){
         guestService.delete(id);
         return ResponseEntity.noContent().build();

@@ -1,1 +1,248 @@
-<p>event-component works!</p>
+<div class="p-5 h-full">
+  <div class="flex flex-col items-center justify-center">
+    <!-- Seção de Detalhes do Evento -->
+    <div class="w-full max-w-4xl mb-6 p-6 bg-base-100 shadow-lg rounded-box" *ngIf="event">
+      <h1 class="text-2xl font-bold mb-3">{{event.name}}</h1>
+      <p class="mb-4">{{event.description}}</p>
+
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <p class="text-sm">Data do evento: {{formatDate(event.eventDate)}}</p>
+          <p class="text-sm">Total de convidados: {{event.guestNumber}}</p>
+        </div>
+
+        <!-- Countdown Timer -->
+        <div class="flex gap-5">
+          <div>
+            <span class="countdown font-mono text-4xl">
+              <span [style]="'--value:' + countdown.days" aria-live="polite" [attr.aria-label]="countdown.days">{{countdown.days}}</span>
+            </span>
+            days
+          </div>
+          <div>
+            <span class="countdown font-mono text-4xl">
+              <span [style]="'--value:' + countdown.hours" aria-live="polite" [attr.aria-label]="countdown.hours">{{countdown.hours}}</span>
+            </span>
+            hours
+          </div>
+          <div>
+            <span class="countdown font-mono text-4xl">
+              <span [style]="'--value:' + countdown.minutes" aria-live="polite" [attr.aria-label]="countdown.minutes">{{countdown.minutes}}</span>
+            </span>
+            min
+          </div>
+          <div>
+            <span class="countdown font-mono text-4xl">
+              <span [style]="'--value:' + countdown.seconds" aria-live="polite" [attr.aria-label]="countdown.seconds">{{countdown.seconds}}</span>
+            </span>
+            sec
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Endereço -->
+    <div class="w-full max-w-4xl mb-6">
+      <div class="bg-base-100 shadow-md rounded-box p-6" *ngIf="address">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-xl font-bold">Endereço</h2>
+          <button class="btn btn-sm btn-outline" (click)="editAddress()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>
+            Editar
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p><strong>Rua:</strong> {{address.street}}, {{address.number}}</p>
+            <p *ngIf="address.complement"><strong>Complemento:</strong> {{address.complement}}</p>
+            <p><strong>Bairro:</strong> {{address.neighborhood}}</p>
+          </div>
+          <div>
+            <p><strong>Cidade:</strong> {{address.city}}</p>
+            <p><strong>Estado:</strong> {{address.state}}</p>
+            <p><strong>CEP:</strong> {{address.zipCode}}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botão para registrar endereço se não existir -->
+      <div class="text-center p-6 bg-base-200 rounded-box" *ngIf="!address">
+        <p class="mb-4">Nenhum endereço registrado para este evento</p>
+        <button class="btn btn-primary" (click)="openAddAddressModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Registrar Endereço
+        </button>
+      </div>
+    </div>
+
+    <!-- Cabeçalho com título e botão de adicionar -->
+    <div class="w-full max-w-4xl flex justify-between items-center mb-2">
+      <h2 class="text-xl font-bold">Mesas</h2>
+      <button class="btn btn-primary" (click)="openAddTableModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Adicionar Mesa
+      </button>
+    </div>
+
+    <!-- Grid de Cards -->
+    <div class="w-full max-w-4xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <!-- Cards para cada mesa -->
+        <div class="card card-border bg-base-100 shadow-md" *ngFor="let table of tables">
+          <div class="card-body">
+            <h2 class="card-title">Mesa #{{ table.id }}</h2>
+            <p class="text-sm">{{ table.description }}</p>
+            <div class="flex items-center mt-2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+              </svg>
+              <span>{{ table.guestNumber }} convidados</span>
+            </div>
+            <div class="card-actions justify-end mt-2">
+              <button class="btn btn-sm btn-outline" (click)="deleteTable(table.id)">
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+              <button class="btn btn-sm btn-outline" (click)="editTableDetails(table.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Detalhes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensagem quando não há dados -->
+      <div *ngIf="tables.length === 0" class="text-center p-6 bg-base-200 rounded-box">
+        <p>Nenhuma mesa encontrada</p>
+      </div>
+    </div>
+
+    <!-- Paginação - mantida como estava -->
+    <div class="join mt-4" *ngIf="totalPages > 0">
+      <button
+        *ngFor="let page of getPageNumbers()"
+        class="join-item btn"
+        [class.btn-active]="page === currentPage"
+        (click)="changePage(page)">
+        {{ page + 1 }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal para adicionar endereço -->
+  <dialog id="add_address_modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">{{ isEditingAddress ? 'Editar' : 'Registrar' }} Endereço</h3>
+      <form [formGroup]="addressForm" (ngSubmit)="saveAddress()">
+      <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
+          <legend class="fieldset-legend">Detalhes do Endereço</legend>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label">Rua</label>
+              <input type="text" class="input input-bordered w-full" placeholder="Rua" formControlName="street">
+              <div *ngIf="addressForm.get('street')?.invalid && addressForm.get('street')?.touched" class="text-error text-sm mt-1">
+                Rua é obrigatória
+              </div>
+            </div>
+
+            <div>
+              <label class="label">Número</label>
+              <input type="number" class="input input-bordered w-full" placeholder="Número" formControlName="number">
+              <div *ngIf="addressForm.get('number')?.invalid && addressForm.get('number')?.touched" class="text-error text-sm mt-1">
+                Número é obrigatório
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="label">Complemento</label>
+            <input type="text" class="input input-bordered w-full" placeholder="Complemento (opcional)" formControlName="complement">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label">Bairro</label>
+              <input type="text" class="input input-bordered w-full" placeholder="Bairro" formControlName="neighborhood">
+              <div *ngIf="addressForm.get('neighborhood')?.invalid && addressForm.get('neighborhood')?.touched" class="text-error text-sm mt-1">
+                Bairro é obrigatório
+              </div>
+            </div>
+
+            <div>
+              <label class="label">Cidade</label>
+              <input type="text" class="input input-bordered w-full" placeholder="Cidade" formControlName="city">
+              <div *ngIf="addressForm.get('city')?.invalid && addressForm.get('city')?.touched" class="text-error text-sm mt-1">
+                Cidade é obrigatória
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label">Estado</label>
+              <input type="text" class="input input-bordered w-full" placeholder="Estado" formControlName="state">
+              <div *ngIf="addressForm.get('state')?.invalid && addressForm.get('state')?.touched" class="text-error text-sm mt-1">
+                Estado é obrigatório
+              </div>
+            </div>
+
+            <div>
+              <label class="label">CEP</label>
+              <input type="number" class="input input-bordered w-full" placeholder="CEP" formControlName="zipCode">
+              <div *ngIf="addressForm.get('zipCode')?.invalid && addressForm.get('zipCode')?.touched" class="text-error text-sm mt-1">
+                CEP é obrigatório
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="modal-action">
+          <button type="button" class="btn" (click)="closeAddAddressModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="addressForm.invalid">
+            {{ isEditingAddress ? 'Atualizar' : 'Salvar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+
+  <!-- Modal para adicionar mesa (mantido como estava) -->
+  <dialog id="add_table_modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">Adicionar Nova Mesa</h3>
+      <form [formGroup]="tableForm" (ngSubmit)="saveTable()">
+        <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
+          <legend class="fieldset-legend">Detalhes do Evento</legend>
+
+          <label class="label">Descrição</label>
+          <textarea class="textarea textarea-bordered w-full" placeholder="Descrição detalhada do evento" formControlName="description" rows="3"></textarea>
+          <div *ngIf="tableForm.get('description')?.invalid && tableForm.get('description')?.touched" class="text-error text-sm mt-1">
+            Descrição da mesa é obrigatória
+          </div>
+
+          <label class="label">Número de Convidados</label>
+          <input type="number" class="input input-bordered w-full" placeholder="100" formControlName="guestNumber" min="1" />
+          <div *ngIf="tableForm.get('guestNumber')?.invalid && tableForm.get('guestNumber')?.touched" class="text-error text-sm mt-1">
+            Número de convidados é obrigatório e deve ser maior que zero
+          </div>
+        </fieldset>
+
+        <div class="modal-action">
+          <button type="button" class="btn" (click)="closeAddTableModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="tableForm.invalid">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+</div>

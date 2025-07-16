@@ -2,7 +2,9 @@ package br.com.ifmg.event_manager.services;
 
 import br.com.ifmg.event_manager.dtos.EventDTO;
 import br.com.ifmg.event_manager.entities.Event;
+import br.com.ifmg.event_manager.entities.User;
 import br.com.ifmg.event_manager.repositories.EventRepository;
+import br.com.ifmg.event_manager.repositories.UserRepository;
 import br.com.ifmg.event_manager.services.exceptions.DatabaseException;
 import br.com.ifmg.event_manager.services.exceptions.ResourceNotFound;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +23,9 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Transactional(readOnly = true)
     public Page<EventDTO> findAll(Pageable pegeable) {
         Page<Event> events = eventRepository.findAll(pegeable);
@@ -34,12 +39,39 @@ public class EventService {
         return new EventDTO(event);
     }
 
+    @Transactional(readOnly = true)
+    public Page<EventDTO> findEventsByUserEmail(String userEmail, Pageable pageable) {
+         User user = userRepository.findByEmail(userEmail);
+         if (user == null) {
+             throw new ResourceNotFound("User not found with email: " + userEmail);
+         }
+         Page<Event> events = eventRepository.findByUserId(user.getId(), pageable);
+
+        return events.map(EventDTO::new);
+    }
+
+
     @Transactional
     public EventDTO insert(EventDTO dto) {
         Event entity = new Event();
         copyToEntity(dto, entity);
         entity = eventRepository.save(entity);
         return new EventDTO(entity);
+    }
+
+    @Transactional
+    public EventDTO insertWithUserEmail(EventDTO dto, String userEmail) {
+        // Buscar o usuário pelo email
+        User user = userRepository.findByEmail(userEmail);
+        if (user == null) {
+            throw new ResourceNotFound("User not found with email: " + userEmail);
+        }
+
+        // Configurar o ID do usuário no DTO
+        dto.setUserId(user.getId());
+
+        // Usar o insert existente
+        return insert(dto);
     }
 
     @Transactional
@@ -73,5 +105,12 @@ public class EventService {
         entity.setDescription(dto.getDescription());
         entity.setEventDate(dto.getEventDate());
         entity.setGuestNumber(dto.getGuestNumber());
+
+        // Associar o usuário ao evento, se userId estiver presente
+        if (dto.getUserId() != null) {
+            User user = userRepository.findById(dto.getUserId())
+                    .orElseThrow(() -> new ResourceNotFound("User not found: " + dto.getUserId()));
+            entity.setUser(user);
+        }
     }
 }

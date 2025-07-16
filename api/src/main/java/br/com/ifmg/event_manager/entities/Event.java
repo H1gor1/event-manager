@@ -1,8 +1,8 @@
+
 package br.com.ifmg.event_manager.entities;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
-import org.springframework.cglib.core.internal.LoadingCache;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,8 +22,7 @@ public class Event {
     private LocalDate eventDate;
     private Integer guestNumber; // numero de convidados total
 
-    @OneToOne
-    @JoinColumn(name = "address_id")
+    @OneToOne(mappedBy = "event", cascade = CascadeType.ALL)
     private Address address; // relacionamento com Address 1-1, um evento tem um endereço
 
     @ManyToOne
@@ -79,6 +78,9 @@ public class Event {
 
     public void setAddress(Address address) {
         this.address = address;
+        if (address != null) {
+            address.setEvent(this);
+        }
     }
 
     public User getUser() {
@@ -97,16 +99,15 @@ public class Event {
         this.tables = tables;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Event event)) return false;
-        return Objects.equals(id, event.id) && Objects.equals(name, event.name) && Objects.equals(description, event.description) && Objects.equals(eventDate, event.eventDate) && Objects.equals(guestNumber, event.guestNumber) && Objects.equals(address, event.address) && Objects.equals(user, event.user);
+        return Objects.equals(id, event.id) && Objects.equals(name, event.name) && Objects.equals(description, event.description) && Objects.equals(eventDate, event.eventDate) && Objects.equals(guestNumber, event.guestNumber) && Objects.equals(user, event.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, eventDate, guestNumber, address, user);
+        return Objects.hash(id, name, description, eventDate, guestNumber, user);
     }
 
     @Override
@@ -117,7 +118,6 @@ public class Event {
                 ", description='" + description + '\'' +
                 ", eventDate=" + eventDate +
                 ", guestNumber=" + guestNumber +
-                ", address=" + address +
                 ", user=" + user +
                 '}';
     }

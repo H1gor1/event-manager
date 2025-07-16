@@ -34,6 +34,7 @@ public class TableEntityController {
                     @ApiResponse(responseCode = "403", description = "Forbidden")
             }
     )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<Page<TableEntityDTO>> findAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
@@ -55,6 +56,7 @@ public class TableEntityController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<TableEntityDTO> findById(@PathVariable Long id){
 
         TableEntityDTO table = tableEntityService.findById(id);
@@ -70,6 +72,7 @@ public class TableEntityController {
                     @ApiResponse(responseCode = "404", description = "Event Not Found")
             }
     )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Page<TableEntityDTO>> findByEventId(
             @PathVariable Long eventId,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -118,7 +121,7 @@ public class TableEntityController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<TableEntityDTO> update(@PathVariable Long id, @RequestBody TableEntityDTO dto){
 
         dto = tableEntityService.update(id, dto);
@@ -138,7 +141,7 @@ public class TableEntityController {
                     @ApiResponse(responseCode = "404", description = "Not Found")
             }
     )
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<Void> delete(@PathVariable Long id){
         tableEntityService.delete(id);
         return ResponseEntity.noContent().build();

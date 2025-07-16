@@ -8,16 +8,20 @@ public class GuestDTO {
     private Long id;
     private String name;
     private String email;
+    private String phone;
+    private String urlPhoto;
     private Boolean confirmed;
     private Long tableId; // Adicionando o ID da mesa
 
     public GuestDTO() {
     }
 
-    public GuestDTO(Long id, String name, String email, Boolean confirmed, Long tableId) {
+    public GuestDTO(Long id, String name, String email, String phone, String urlPhoto, Boolean confirmed, Long tableId) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.phone = phone;
+        this.urlPhoto = urlPhoto;
         this.confirmed = confirmed;
         this.tableId = tableId;
     }
@@ -26,6 +30,8 @@ public class GuestDTO {
         this.id = guest.getId();
         this.name = guest.getName();
         this.email = guest.getEmail();
+        this.phone = guest.getPhone();
+        this.urlPhoto = guest.getUrlPhoto();
         this.confirmed = guest.getConfirmed();
         this.tableId = guest.getTable() != null ? guest.getTable().getId() : null;
     }
@@ -68,6 +74,22 @@ public class GuestDTO {
 
     public void setTableId(Long tableId) {
         this.tableId = tableId;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getUrlPhoto() {
+        return urlPhoto;
+    }
+
+    public void setUrlPhoto(String urlPhoto) {
+        this.urlPhoto = urlPhoto;
     }
 
     @Override
