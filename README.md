@@ -5,6 +5,9 @@ Este repositório contém o trabalho da matéria optativa de "Desenvolvimento Ba
 
 O intúito era desenvolver um sistema de gerenciamento de eventos composto por backend (Spring) e frontend (Angular), utilizando PostgreSQL como banco de dados.
 
+<div align="center"> <table> <tr> <td><img src="https://github.com/user-attachments/assets/35f6337c-446e-49c1-b53b-3d4ee14c3a22" width="450" /></td> <td><img src="https://github.com/user-attachments/assets/45056bcd-b67e-4e43-960c-a1656c1f60a9" width="450"/>
+</td> </tr> <tr> <td><img src="https://github.com/user-attachments/assets/2b526932-22e0-4122-86b6-f9c08e3c4980" width="450" /></td> <td><img src="https://github.com/user-attachments/assets/a4d81983-bbfc-40ed-8057-f8b5571df220" width="450"/>
+</td> </tr> </table> </div>
 
 
 ## Pré-requisitos
