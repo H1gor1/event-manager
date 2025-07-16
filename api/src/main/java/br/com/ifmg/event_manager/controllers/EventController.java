@@ -71,7 +71,7 @@ public class EventController {
             @RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
             @AuthenticationPrincipal Jwt jwt
     ) {
-        String userEmail = jwt.getClaimAsString("username"); //aqui eu to pegando o email de dentro do token
+        String userEmail = jwt.getClaimAsString("username");
 
 
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction), orderBy);

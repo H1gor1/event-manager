@@ -1,6 +1,7 @@
 package br.com.ifmg.event_manager.controllers;
 
 import br.com.ifmg.event_manager.dtos.GuestDTO;
+import br.com.ifmg.event_manager.dtos.TicketDTO;
 import br.com.ifmg.event_manager.services.GuestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/guests")
@@ -47,6 +50,66 @@ public class GuestController {
 
         return ResponseEntity.ok().body(guests);
     }
+
+
+    @GetMapping("/public/{id}/status")
+    @Operation(
+            description = "Check if a guest has confirmed attendance",
+            summary = "Public endpoint to check guest confirmation status",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Status retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Guest not found")
+            }
+    )
+    public ResponseEntity<Map<String, Boolean>> getGuestStatus(@PathVariable Long id) {
+        GuestDTO guest = guestService.findById(id);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("confirmed", guest.getConfirmed());
+        return ResponseEntity.ok().body(response);
+    }
+
+    // Rota pública para obter os detalhes de um convidado para o ticket
+    @GetMapping("/public/{id}/details")
+    @Operation(
+            description = "Get guest details for ticket generation",
+            summary = "Public endpoint to get guest details",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Details retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Guest not found")
+            }
+    )
+    public ResponseEntity<TicketDTO> getGuestDetails(@PathVariable Long id) {
+        TicketDTO ticket = guestService.getGuestTicketDetails(id);
+        return ResponseEntity.ok().body(ticket);
+    }
+
+    // Rota pública para confirmar a presença de um convidado
+    @PostMapping("/public/{id}/confirm")
+    @Operation(
+            description = "Confirm guest attendance",
+            summary = "Public endpoint to confirm guest attendance",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Attendance confirmed successfully"),
+                    @ApiResponse(responseCode = "404", description = "Guest not found")
+            }
+    )
+    public ResponseEntity<TicketDTO> confirmGuestAttendance(
+            @PathVariable Long id,
+            @RequestBody Map<String, Long> requestBody) {
+
+        Long eventId = requestBody.get("eventId");
+        Long tableId = requestBody.get("tableId");
+
+        if (eventId == null || tableId == null) {
+            throw new IllegalArgumentException("eventId and tableId are required");
+        }
+
+        TicketDTO ticket = guestService.confirmGuestAttendance(id, eventId, tableId);
+        return ResponseEntity.ok().body(ticket);
+    }
+
+
+
 
     @GetMapping(value = "/by-table/{tableId}", produces = "application/json")
     @Operation(

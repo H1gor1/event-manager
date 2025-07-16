@@ -1,0 +1,11 @@
+@media print {
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Ajustes para impressão - usando classes do Tailwind/DaisyUI */
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}

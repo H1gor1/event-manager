@@ -94,7 +94,7 @@
 
         <div class="form-control mb-3">
           <label class="label">Telefone</label>
-          <input type="tel" formControlName="phone" class="input input-bordered w-full" placeholder="Telefone do convidado" />
+          <input type="text" formControlName="phone" class="input input-bordered w-full" placeholder="Telefone do convidado" mask="(00) 00000-0000" />
         </div>
 
         <div class="form-control mb-4">
@@ -110,6 +110,7 @@
     </fieldset>
   </div>
 </div>
+
 
 <!-- Modal para detalhes do convidado -->
 <div class="modal" [class.modal-open]="isGuestDetailsModalOpen">

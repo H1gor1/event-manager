@@ -1,15 +1,24 @@
 import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
-import {AuthServiceTs} from './services/auth.service.ts';
+import { CanActivateFn, Router } from '@angular/router';
 
 export const AuthGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthServiceTs);
   const router = inject(Router);
 
-  if (authService.isAuthenticated()) {
+  // Verificar se é uma rota pública
+  const isPublicRoute = state.url.includes('/public/');
+
+  // Se for uma rota pública, permite o acesso sem verificar autenticação
+  if (isPublicRoute) {
     return true;
   }
-  router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-  return false;
 
+  // Verifica se o usuário está autenticado
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    return true;
+  }
+
+  // Se não estiver autenticado e não for rota pública, redireciona para login
+  router.navigate(['/login']);
+  return false;
 };

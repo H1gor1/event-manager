@@ -1,0 +1,120 @@
+<div class="hero min-h-screen bg-base-200">
+  <div class="hero-content flex-col">
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="flex flex-col items-center">
+      <span class="loading loading-spinner loading-lg text-primary mb-4"></span>
+      <p>Carregando informações...</p>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="hasError" class="card w-full max-w-md bg-base-100 shadow-xl">
+      <div class="card-body items-center text-center">
+        <div class="text-error mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+        </div>
+        <h2 class="card-title text-lg">Ocorreu um erro</h2>
+        <p>{{ errorMessage }}</p>
+      </div>
+    </div>
+
+    <!-- Confirmation Page -->
+    <div *ngIf="!isLoading && !hasError && !confirmationSuccess" class="card w-full max-w-md bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-center justify-center mb-6">Confirmação de Presença</h2>
+        <p class="text-center mb-6">
+          Você está sendo convidado para um evento. Clique no botão abaixo para confirmar sua presença.
+        </p>
+        <div class="card-actions justify-center">
+          <button class="btn btn-primary btn-lg" [disabled]="isConfirming" (click)="confirmAttendance()">
+            <fa-icon [icon]="faCheck" *ngIf="!isConfirming" class="mr-2"></fa-icon>
+            <span class="loading loading-spinner loading-sm" *ngIf="isConfirming"></span>
+            {{ isConfirming ? 'Confirmando...' : 'Confirmar Presença' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticket View (after confirmation) -->
+    <div *ngIf="confirmationSuccess && eventDetails" class="w-full max-w-md print-content">
+      <div class="card bg-base-100 shadow-xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-primary text-primary-content p-6 text-center">
+          <h1 class="text-2xl font-bold">{{ eventDetails.event.name }}</h1>
+          <p class="opacity-90">{{ eventDetails.event.description }}</p>
+        </div>
+
+        <!-- Guest Badge -->
+        <div class="bg-base-200 flex items-center justify-center p-4 border-b border-base-300">
+          <div class="avatar mr-4">
+            <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-content">
+              <img [src]="eventDetails.urlPhoto || 'https://creatorspace.imgix.net/users/clqwesjnl07tjp701li4dd97g/IHS4oesRPt80mw4I-jUlD2p9A_400x400.jpg?w=300&h=300'" alt="Avatar do convidado" />
+            </div>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold">{{ eventDetails.guestName }}</h2>
+            <div class="badge badge-success">Presença Confirmada</div>
+          </div>
+        </div>
+
+        <!-- Event Details -->
+        <div class="p-6">
+          <!-- Date -->
+          <div class="flex items-start mb-4">
+            <fa-icon [icon]="faCalendarDay" class="text-primary text-lg mt-1 mr-3 w-5"></fa-icon>
+            <div>
+              <h3 class="font-bold">Data do Evento</h3>
+              <p>{{ formatDate(eventDetails.event.eventDate) }}</p>
+            </div>
+          </div>
+
+          <!-- Location -->
+          <div class="flex items-start mb-4">
+            <fa-icon [icon]="faMapMarkerAlt" class="text-primary text-lg mt-1 mr-3 w-5"></fa-icon>
+            <div>
+              <h3 class="font-bold">Local</h3>
+              <p>
+                {{ eventDetails.address.street }}, {{ eventDetails.address.number }}
+                <span *ngIf="eventDetails.address.complement">, {{ eventDetails.address.complement }}</span>
+              </p>
+              <p>{{ eventDetails.address.neighborhood }}</p>
+              <p>{{ eventDetails.address.city }} - {{ eventDetails.address.state }}</p>
+              <p>CEP: {{ eventDetails.address.zipCode }}</p>
+            </div>
+          </div>
+
+          <!-- Table Info -->
+          <div class="flex items-start">
+            <fa-icon [icon]="faUsers" class="text-primary text-lg mt-1 mr-3 w-5"></fa-icon>
+            <div>
+              <h3 class="font-bold">Mesa</h3>
+              <p>{{ eventDetails.table.description }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR Code (optional) -->
+        <div class="p-6 bg-base-200 flex flex-col items-center">
+          <div class="bg-white p-4 rounded-lg mb-2">
+            <!-- Mockup de QR code usando um elemento div -->
+            <div class="mockup-code bg-white text-black p-0 w-32 h-32 flex items-center justify-center">
+              <img [src]="'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/QR_Code_Example.svg/1024px-QR_Code_Example.svg.png'" alt="QrCode" />
+            </div>
+          </div>
+          <p class="text-sm text-center">
+            Apresente este ticket na entrada do evento
+          </p>
+        </div>
+      </div>
+
+      <!-- Printable version button -->
+      <div class="mt-4 text-center print:hidden">
+        <button class="btn btn-outline" (click)="printTicket()">
+          <fa-icon [icon]="faPrint" class="mr-2"></fa-icon>
+          Imprimir Ticket
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

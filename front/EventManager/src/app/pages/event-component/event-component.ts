@@ -90,6 +90,7 @@ export class EventComponent implements OnInit, OnDestroy {
   event!: Event;
   address: Address | null = null;
   tables: Table[] = [];
+  tableIdToDelete: number | null = null;
 
   currentPage = 0;
   totalPages = 0;
@@ -117,7 +118,7 @@ export class EventComponent implements OnInit, OnDestroy {
   ) {
     this.tableForm = this.fb.group({
       description: ['', Validators.required],
-      guestNumber: [null, [Validators.required, Validators.min(1)]]
+      guestNumber: [null, [Validators.required, Validators.min(1), Validators.max(10)]]
     });
 
     this.addressForm = this.fb.group({
@@ -346,8 +347,43 @@ export class EventComponent implements OnInit, OnDestroy {
     }
   }
 
+
   deleteTable(id: number) {
-    //TODO
+    this.tableIdToDelete = id;
+    const modal = document.getElementById('delete_table_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.showModal();
+    }
+  }
+
+// Método para fechar a modal de exclusão
+  closeDeleteModal() {
+    const modal = document.getElementById('delete_table_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.close();
+      this.tableIdToDelete = null;
+    }
+  }
+
+// Método para confirmar a exclusão da mesa
+  confirmDeleteTable() {
+    if (this.tableIdToDelete) {
+      this.http.delete(`http://localhost:8080/table-entities/${this.tableIdToDelete}`)
+        .subscribe({
+          next: () => {
+            // Fechar a modal
+            this.closeDeleteModal();
+            // Atualizar a lista de mesas após a exclusão bem-sucedida
+            this.loadTables(this.currentPage, this.eventId);
+          },
+          error: (error) => {
+            console.error('Erro ao excluir mesa:', error);
+            // Fechar a modal mesmo em caso de erro
+            this.closeDeleteModal();
+            // Aqui você poderia exibir uma mensagem de erro
+          }
+        });
+    }
   }
 
   protected readonly faTrash = faTrash;

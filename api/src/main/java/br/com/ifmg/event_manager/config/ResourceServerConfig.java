@@ -41,6 +41,17 @@ public class ResourceServerConfig {
 	}
 
 	@Bean
+	@Order(2)
+	public SecurityFilterChain publicEndpointsSecurityFilterChain(HttpSecurity http) throws Exception {
+		http.securityMatcher("/guests/public/**")
+				.csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+				.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+		return http.build();
+	}
+
+	@Bean
 	@Order(3)
 	public SecurityFilterChain rsSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable());
