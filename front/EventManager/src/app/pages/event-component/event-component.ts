@@ -5,7 +5,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/
 import {HttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {faTrash} from '@fortawesome/free-solid-svg-icons';
+import {faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {interval, Subscription} from 'rxjs';
 
 interface Event {
@@ -89,14 +89,17 @@ export class EventComponent implements OnInit, OnDestroy {
   eventId!: number;
   event!: Event;
   address: Address | null = null;
+  table!: Table;
   tables: Table[] = [];
   tableIdToDelete: number | null = null;
+  tableIdToEdit: number | null = null;
 
   currentPage = 0;
   totalPages = 0;
   pageSize = 10;
 
   tableForm: FormGroup;
+  tableEditForm: FormGroup;
   addressForm: FormGroup;
 
   isEditingAddress = false;
@@ -120,6 +123,11 @@ export class EventComponent implements OnInit, OnDestroy {
       description: ['', Validators.required],
       guestNumber: [null, [Validators.required, Validators.min(1), Validators.max(10)]]
     });
+
+    this.tableEditForm = this.fb.group({
+      description: ['', Validators.required],
+      guestNumber: [null, [Validators.required, Validators.min(1), Validators.max(10)]]
+    })
 
     this.addressForm = this.fb.group({
       street: ['', Validators.required],
@@ -156,6 +164,13 @@ export class EventComponent implements OnInit, OnDestroy {
       .subscribe(response => {
         this.event = response;
         this.startCountdown(new Date(this.event.eventDate));
+      });
+  }
+
+  loadTable(id: number) {
+    this.http.get<Table>(`http://localhost:8080/table-entities/${id}`)
+      .subscribe(response => {
+        this.table = response;
       });
   }
 
@@ -387,4 +402,45 @@ export class EventComponent implements OnInit, OnDestroy {
   }
 
   protected readonly faTrash = faTrash;
+  protected readonly faEdit = faEdit;
+
+  openEditTableModal(id: number) {
+    this.tableIdToEdit = id;
+    this.loadTable(id);
+    this.tableEditForm.patchValue({
+      description: this.table.description,
+      guestNumber: this.table.guestNumber
+    });
+    const modal = document.getElementById('edit_table_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.showModal();
+    }
+  }
+
+  saveEditTable(): void {
+    if (this.tableEditForm.valid) {
+      const tableData: TableCreate = {
+        ...this.tableEditForm.value,
+        eventId: this.eventId
+      };
+
+      this.http.put<Table>(`http://localhost:8080/table-entities/${this.tableIdToEdit}`, tableData)
+        .subscribe({
+          next: (response) => {
+            this.closeEditModal();
+            this.loadTables(this.currentPage, this.eventId); // Recarrega a página atual
+          },
+          error: (error) => {
+            console.error('Erro ao salvar mesa:', error);
+          }
+        });
+    }
+  }
+
+  closeEditModal() {
+    const modal = document.getElementById('edit_table_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.close();
+    }
+  }
 }
