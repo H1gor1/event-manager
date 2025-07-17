@@ -1,10 +1,12 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Card } from '../../components/card/card';
 import { CommonModule } from '@angular/common';
+import {faTrash} from '@fortawesome/free-solid-svg-icons';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { DatePickerComponent } from '../../components/date-picker/date-picker.component';
+import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 
 interface Event {
   id: number;
@@ -38,7 +40,8 @@ interface EventCreate {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    DatePickerComponent
+    DatePickerComponent,
+    FaIconComponent
   ],
   templateUrl: './home.html',
   styleUrl: './home.css'
@@ -49,6 +52,7 @@ export class Home implements OnInit {
   totalPages = 0;
   pageSize = 10;
   eventForm: FormGroup;
+  eventIdToDelete: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -134,4 +138,44 @@ export class Home implements OnInit {
     // Navegar para a página de detalhes do evento
     this.router.navigate(['/event', eventId]);
   }
+
+  deleteEvent(id: number) {
+    this.eventIdToDelete = id;
+    const modal = document.getElementById('delete_event_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.showModal();
+    }
+  }
+
+// Método para fechar a modal de exclusão
+  closeDeleteModal() {
+    const modal = document.getElementById('delete_event_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.close();
+      this.eventIdToDelete = null;
+    }
+  }
+
+// Método para confirmar a exclusão da mesa
+  confirmDeleteEvent() {
+    if (this.eventIdToDelete) {
+      this.http.delete(`http://localhost:8080/events/${this.eventIdToDelete}`)
+        .subscribe({
+          next: () => {
+            // Fechar a modal
+            this.closeDeleteModal();
+            // Atualizar a lista de mesas após a exclusão bem-sucedida
+            this.loadEvents(this.currentPage);
+          },
+          error: (error) => {
+            console.error('Erro ao excluir mesa:', error);
+            // Fechar a modal mesmo em caso de erro
+            this.closeDeleteModal();
+            // Aqui você poderia exibir uma mensagem de erro
+          }
+        });
+    }
+  }
+
+  protected readonly faTrash = faTrash;
 }

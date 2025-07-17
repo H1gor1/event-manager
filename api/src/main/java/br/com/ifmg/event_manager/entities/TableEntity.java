@@ -19,7 +19,7 @@ public class TableEntity {
 
     private Integer guestNumber; // numero de convidados nesta mesa
 
-    @OneToMany(mappedBy = "table")
+    @OneToMany(mappedBy = "table", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Guest> guests = new ArrayList<>(); // relacionamento com Guest 1-N, uma mesa pode ter vários convidados
 
     @ManyToOne

@@ -29,7 +29,7 @@ public class Event {
     @JoinColumn(name = "user_id")
     private User user; // relacionamento com User 1-N, um usuário pode ter mais de 1 evento e um evento pertence a um usuário
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TableEntity> tables = new ArrayList<>(); // relacionamento com TableEntity 1-N, um evento pode ter várias mesas
 
     public Long getId() {

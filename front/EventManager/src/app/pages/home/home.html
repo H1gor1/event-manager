@@ -41,6 +41,9 @@
               </svg>
               Detalhes
             </button>
+            <button class="btn btn-sm btn-outline ml-2" (click)="deleteEvent(event.id)">
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
           </td>
         </tr>
         <!-- Mensagem quando não há dados -->
@@ -103,4 +106,17 @@
       </form>
     </div>
   </dialog>
+
+  <!-- Modal de confirmação para excluir evento -->
+  <dialog id="delete_event_modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">Confirmar Exclusão</h3>
+      <p class="py-4">Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.</p>
+      <div class="modal-action">
+        <button class="btn" (click)="closeDeleteModal()">Cancelar</button>
+        <button class="btn btn-error" (click)="confirmDeleteEvent()">Excluir</button>
+      </div>
+    </div>
+  </dialog>
+
 </div>
